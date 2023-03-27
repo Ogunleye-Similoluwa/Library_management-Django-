@@ -6,9 +6,12 @@ from django_enumfield import enum
 
 
 # Create your models here.
+class LibraryUser(models.Model):
+
 class Author(models.Model):
     first_name = models.CharField(max_length=400, null=False, blank=False)
     last_name = models.CharField(max_length=400, null=False, blank=False)
+    email = models.EmailField(blank=True, null=False)
     date_of_birth = models.DateField(null=False, blank=False)
     date_of_death = models.DateField(null=True, blank=True, default='0000-00-0')
 
@@ -54,13 +57,23 @@ class Genre(models.Model):
 
 
 class Book(models.Model):
+    LANGUAGE_CHOICES = [
+        ('ENGLISH', 'ENG'),
+        ('FRENCH', 'FRE')
+    ]
+    GENRE_CHOICES = [
+        ('FICTION', 'FIC'),
+        ('DRAMA', 'DRA'),
+        ('ROMANCE', 'rom')
+    ]
     title = models.CharField(max_length=400, null=False, blank=False)
     isbn = models.CharField(max_length=13, null=False, blank=False)
     description = models.CharField(max_length=400, null=False, blank=False)
     date_added = models.DateField(auto_now_add=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='authors')
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='genres')
-    language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name='languages')
+    genre = models.CharField(max_length=10, choices=GENRE_CHOICES, default='FIC')
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='ENG')
+
 
     def __str__(self):
         return f"{self.title}---{self.date_added}"

@@ -1,11 +1,55 @@
 import http
 
 from django.shortcuts import render
+from rest_framework import generics
 from rest_framework.response import Response
 
 from books.models import Book, Author
 from .serializers import BookSerializer, BookCreateSerializer, BookUpdateSerializer, AuthorSerializer
 from rest_framework.decorators import api_view
+
+
+class BookCreateView(generics.ListAPIView):
+    queryset = Book.objects.select_related('author').all()
+    serializer_class = BookSerializer
+
+
+class BookDeleteView(generics.RetrieveDestroyAPIView):
+    queryset = Book.objects.all()
+    lookup_field = "pk"
+    serializer_class = BookSerializer
+
+
+class BookListView(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+
+class GetBook(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    lookup_field = "pk"
+
+
+class GetAllAuthor(generics.ListAPIView):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+
+
+class GetAuthor(generics.RetrieveAPIView):
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+    lookup_field = "pk"
+
+
+class AuthorCreate(generics.CreateAPIView):
+    serializer_class = AuthorSerializer
+
+
+class AuthorDeleteView(generics.RetrieveDestroyAPIView):
+    queryset = Author.objects.all()
+    lookup_field = "pk"
+    serializer_class = AuthorSerializer
 
 
 # @api_view(['GET', 'POST'])
@@ -35,9 +79,9 @@ from rest_framework.decorators import api_view
 #         return Response("Book Deleted successfully")
 #
 #
-# @api_view(['GET', 'POST'])
-# def author_list(request):
-#     if request.method == 'GET':
-#         queryset = Author.objects.all()
-#         serializers = AuthorSerializer(queryset, many=True)
-#         return Response(serializers.data)
+@api_view(['GET', 'POST'])
+def author_list(request):
+    if request.method == 'GET':
+        queryset = Author.objects.all()
+        serializers = AuthorSerializer(queryset, many=True)
+        return Response(serializers.data)
