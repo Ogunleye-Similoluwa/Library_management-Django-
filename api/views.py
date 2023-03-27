@@ -1,15 +1,25 @@
 import http
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
-from books.models import Book, Author
+from book.models import Book, Author
+from .pagination import DefaultPageNumberPagination
 from .serializers import BookSerializer, BookCreateSerializer, BookUpdateSerializer, AuthorSerializer
 from rest_framework.decorators import api_view
 
 
-class BookCreateView(generics.ListAPIView):
+
+
+class BookCreateView(generics.CreateAPIView):
+    queryset = Book.objects.select_related('author').all()
+    serializer_class = BookCreateSerializer
+
+
+class BookView(generics.ListAPIView):
     queryset = Book.objects.select_related('author').all()
     serializer_class = BookSerializer
 
@@ -50,6 +60,26 @@ class AuthorDeleteView(generics.RetrieveDestroyAPIView):
     queryset = Author.objects.all()
     lookup_field = "pk"
     serializer_class = AuthorSerializer
+
+
+@api_view()
+def author_detail(request, pk):
+    author = get_object_or_404(Author, pk=pk)
+    serializer = AuthorSerializer(author)
+    return Response(serializer.data)
+
+
+class AuthorViewSet(ModelViewSet):
+    pagination_class = DefaultPageNumberPagination
+
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+
+
+class BookViewSet(ModelViewSet):
+    pagination_class = DefaultPageNumberPagination
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
 
 
 # @api_view(['GET', 'POST'])

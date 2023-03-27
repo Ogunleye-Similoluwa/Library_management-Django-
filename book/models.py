@@ -1,12 +1,16 @@
 from uuid import uuid4
 
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from enum import Enum
 from django_enumfield import enum
 
 
 # Create your models here.
-class LibraryUser(models.Model):
+class LibraryUser(AbstractUser):
+    app = models.IntegerField
+    email = models.EmailField(unique=True)
+
 
 class Author(models.Model):
     first_name = models.CharField(max_length=400, null=False, blank=False)
@@ -32,39 +36,42 @@ class Author(models.Model):
 #         return self.name
 
 
-class Language(models.Model):
-    STATUS_CHOICES = [
-        ('ENGLISH', 'ENG'),
-        ('FRENCH', 'FRE')
-    ]
-
-    name = models.CharField(max_length=10, choices=STATUS_CHOICES, default='ENG')
-
-    def __str__(self):
-        return self.name
-
-
-class Genre(models.Model):
-    STATUS_CHOICES = [
-        ('FICTION', 'FIC'),
-        ('DRAMA', 'DRA'),
-        ('ROMANCE', 'rom')
-    ]
-    name = models.CharField(max_length=10, choices=STATUS_CHOICES, default='FIC')
-
-    def __str__(self):
-        return self.name
-
+# class Language(models.Model):
+#     STATUS_CHOICES = [
+#         ('ENGLISH', 'ENG'),
+#         ('FRENCH', 'FRE')
+#     ]
+#
+#     name = models.CharField(max_length=10, choices=STATUS_CHOICES, default='ENG')
+#
+#     def __str__(self):
+#         return self.name
+#
+#
+# class Genre(models.Model):
+#     STATUS_CHOICES = [
+#         ('FICTION', 'FIC'),
+#         ('DRAMA', 'DRA'),
+#         ('ROMANCE', 'rom')
+#     ]
+#     name = models.CharField(max_length=10, choices=STATUS_CHOICES, default='FIC')
+#
+#     def __str__(self):
+#         return self.name
+#
 
 class Book(models.Model):
-    LANGUAGE_CHOICES = [
-        ('ENGLISH', 'ENG'),
-        ('FRENCH', 'FRE')
-    ]
     GENRE_CHOICES = [
-        ('FICTION', 'FIC'),
-        ('DRAMA', 'DRA'),
-        ('ROMANCE', 'rom')
+        ('FINANCE', 'FIN'),
+        ('POLITICS', 'POL'),
+        ('POWER', 'POW'),
+        ('COMEDY', 'COM'),
+    ]
+    LANGUAGE_CHOICES = [
+        ('YORUBA', 'YOR'),
+        ('IGBO', 'IGB'),
+        ('HAUSA', 'HAU'),
+        ('ENGLISH', 'ENG')
     ]
     title = models.CharField(max_length=400, null=False, blank=False)
     isbn = models.CharField(max_length=13, null=False, blank=False)
@@ -73,7 +80,7 @@ class Book(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='authors')
     genre = models.CharField(max_length=10, choices=GENRE_CHOICES, default='FIC')
     language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, default='ENG')
-
+    price = models.DecimalField(default=0, max_digits=6, decimal_places=2)
 
     def __str__(self):
         return f"{self.title}---{self.date_added}"

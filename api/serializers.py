@@ -1,13 +1,13 @@
 from abc import ABC
 
 from rest_framework import serializers
-from books.models import Book, Author
+from book.models import Book, Author
+from djoser.serializers import UserCreateSerializer as CreateSerializer
 
 
-class BookCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Book
-        fields = ['title', 'isbn', 'description']
+class UserCreateSerializer(CreateSerializer):
+    class Meta(CreateSerializer.Meta):
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
 
 
 class BookUpdateSerializer(serializers.ModelSerializer):
@@ -30,17 +30,35 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
 
 
+class BookCreateSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField()
+    discount_price = serializers.SerializerMethodField(method_name='discount')
+
+    class Meta:
+        model = Book
+        fields = ['title', 'description', 'genre', 'language', 'price', 'author', 'discount_price']
+
+
 class BookSerializer(serializers.ModelSerializer):
     # todo relationship the brings what is in the class info
     # author = AuthorSerializer()
     # todo the below syntax will bring the author name
-    author = serializers.StringRelatedField()
-
+    # author = serializers.StringRelatedField()
     class Meta:
         model = Book
-        fields = ['title', 'description', 'author']
-        # todo  will show  the author id
-        # author = AuthorSerializer
+        fields = ['title', 'description', 'genre', 'language', 'price', 'author', 'date_added', 'discount_price']
+        # todo links to the route of the view
+
+    author = serializers.HyperlinkedRelatedField(queryset=Author.objects.all(), view_name='author_detail',
+                                                 lookup_field="pk")
+    discount_price = serializers.SerializerMethodField(method_name='discount')
+    date_added = serializers.DateField()
+
+    def discount(self, book: Book):
+        return book.price * 25 / 100
+
+    # todo  will show  the author id
+    # author = AuthorSerializer
 
 
 class BookDeleteSerializer(serializers.ModelSerializer):
