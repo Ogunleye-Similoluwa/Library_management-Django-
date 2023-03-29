@@ -2,16 +2,15 @@ import http
 
 from django.shortcuts import render, get_object_or_404
 from rest_framework import generics
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from book.models import Book, Author
+from book.models import Book, Author, BookInstance
 from .pagination import DefaultPageNumberPagination
-from .serializers import BookSerializer, BookCreateSerializer, BookUpdateSerializer, AuthorSerializer
+from .permissions import IsAdminOrReadOnly
+from .serializers import BookSerializer, BookCreateSerializer, BookUpdateSerializer, AuthorSerializer, BookInstanceSerializer
 from rest_framework.decorators import api_view
-
-
+from rest_framework.permissions import IsAuthenticated
 
 
 class BookCreateView(generics.CreateAPIView):
@@ -20,6 +19,7 @@ class BookCreateView(generics.CreateAPIView):
 
 
 class BookView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Book.objects.select_related('author').all()
     serializer_class = BookSerializer
 
@@ -77,9 +77,16 @@ class AuthorViewSet(ModelViewSet):
 
 
 class BookViewSet(ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
     pagination_class = DefaultPageNumberPagination
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+
+
+class BookInstanceViewSet(ModelViewSet):
+    pagination_class = DefaultPageNumberPagination
+    queryset = BookInstance.objects.all()
+    serializer_class = BookInstanceSerializer
 
 
 # @api_view(['GET', 'POST'])

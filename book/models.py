@@ -8,7 +8,6 @@ from django_enumfield import enum
 
 # Create your models here.
 class LibraryUser(AbstractUser):
-    app = models.IntegerField
     email = models.EmailField(unique=True)
 
 
@@ -96,8 +95,7 @@ class BookInstance(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='A')
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     imprint = models.CharField(max_length=400, null=False, blank=False)
-
-    # borrower = models.ForeignKey('auth.User', on_delete=models.CASCADE, name='borrower')
+    borrower = models.OneToOneField(LibraryUser, on_delete=models.CASCADE, name='borrower',default='')
 
     def __str__(self):
         return self.imprint

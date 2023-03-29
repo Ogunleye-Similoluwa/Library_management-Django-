@@ -4,8 +4,10 @@ from api import views
 
 router = SimpleRouter()
 router2 = SimpleRouter()
+router3 = SimpleRouter()
 router.register('authors', views.AuthorViewSet)
 router2.register('books', views.BookViewSet)
+router3.register('book_instance', views.BookInstanceViewSet)
 urlpatterns = [
     # path('book', views.books_list),
     # path('authors/', views.GetAllAuthor.as_view()),
@@ -21,6 +23,7 @@ urlpatterns = [
     # path("book_delete/<int:pk>", views.BookDeleteView.as_view()),
     # path('book/', views.BookListView.as_view()),
 
-    path('', include(router2.urls))
+    path('', include(router2.urls)),
+    path('', include(router3.urls))
     # path('book', views.BookListView.as_view())
 ]

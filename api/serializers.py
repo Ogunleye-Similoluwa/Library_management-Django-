@@ -1,8 +1,16 @@
 from abc import ABC
 
 from rest_framework import serializers
-from book.models import Book, Author
+from book.models import Book, Author, BookInstance
 from djoser.serializers import UserCreateSerializer as CreateSerializer
+
+
+class BookInstanceSerializer(serializers.ModelSerializer):
+    book = serializers.StringRelatedField
+
+    class Meta:
+        model = BookInstance
+        fields = ['uniqueId', 'due_date', 'status', 'book', 'imprint', 'borrower']
 
 
 class UserCreateSerializer(CreateSerializer):
@@ -31,6 +39,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class BookCreateSerializer(serializers.ModelSerializer):
+    # returns authors name
     author = serializers.StringRelatedField()
     discount_price = serializers.SerializerMethodField(method_name='discount')
 
